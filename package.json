@@ -1,0 +1,23 @@
+{
+  "name": "sendbird-syncmanager",
+  "version": "1.0.0",
+  "description": "SendBird data sync manager for JavaScript",
+  "main": "SendBirdSyncManager.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smilefam/sendBird-syncmanager-javaScript.git"
+  },
+  "author": "SendBird <support@sendbird.com>",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "bugs": {
+    "url": "https://github.com/smilefam/sendBird-syncmanager-javaScript/issues"
+  },
+  "homepage": "https://sendbird.com",
+  "typings": "SendBirdSyncManager.d.ts",
+  "dependencies": {
+    "sendbird": ">=3.0.93"
+  }
+}
