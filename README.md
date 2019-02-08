@@ -3,6 +3,12 @@
 
 SendBird SyncManager is chat data sync management library for SendBird. SyncManager offers an event-based data management framework so that each view would see a single spot by subscribing data event. And it stores the data into IndexedDB or equivalent storage engine which implements local caching for faster loading.
 
+## Install
+
+```
+~$ npm install -S sendbird-syncmanager
+```
+
 ## How It Works
 
 ### Initialization
