@@ -9,6 +9,10 @@ SendBird SyncManager is chat data sync management library for SendBird. SyncMana
 ~$ npm install -S sendbird-syncmanager
 ```
 
+## Sample
+
+We provide sample project to understand `SyncManager` further. Check out [Web Basic Sample with SyncManager](https://github.com/smilefam/SendBird-JavaScript/tree/master/web-basic-sample-syncmanager).
+
 ## How It Works
 
 ### Initialization
