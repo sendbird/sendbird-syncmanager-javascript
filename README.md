@@ -3,15 +3,14 @@
 
 SendBird SyncManager is chat data sync management library for SendBird. SyncManager offers an event-based data management framework so that each view would see a single spot by subscribing data event. And it stores the data into IndexedDB or equivalent storage engine which implements local caching for faster loading.
 
-## Install
+## Build
 
 ```
-~$ npm install -S sendbird-syncmanager
+~$ npm install
+~$ npm run build
 ```
 
-## Sample
-
-We provide sample project to understand `SyncManager` further. Check out [Web Basic Sample with SyncManager](https://github.com/smilefam/SendBird-JavaScript/tree/master/web-basic-sample-syncmanager).
+> Note: SyncManager requires `Node.js` v8.x+ installed to build.
 
 ## How It Works
 
@@ -65,27 +64,26 @@ If the view is closed, which means the collection is obsolete and no longer used
 collection.remove();
 ```
 
-As aforementioned, `ChannelCollection` provides event handler. Event handler is named as `CollectionHandler` and it receives `action` and `channel` when an event has come. The `action` is a keyword to notify what happened to the channel, and the `channel` is the target `sb.BaseChannel` instance. You can create an instance and implement the event handler and add it to the collection.
+As aforementioned, `ChannelCollection` provides event subscriber. Event subscriber is named as `CollectionHandler` and event handler receives `action` and `channel` when an event has come. The `action` is a keyword to notify what happened to the channel, and the `channel` is the target `sb.BaseChannel` instance. You can create an instance and implement the event handler and add it to the collection.
 
 ```js
-const ChannelEventAction = SendBirdSyncManager.ChannelCollection.Action;
 const collectionHandler = new SendBirdSyncManager.ChannelCollection.CollectionHandler();
-collectionHandler.onChannelEvent = (action, channel) => {
+collectionHandler.onChannelEvent = (action, channels) => {
   // apply each event to view here
   switch(action) {
-    case ChannelEventAction.INSERT: {
+    case SendBirdSyncManager.ChannelCollection.Action.INSERT: {
       break;
     }
-    case ChannelEventAction.UPDATE: {
+    case SendBirdSyncManager.ChannelCollection.Action.UPDATE: {
       break;
     }
-    case ChannelEventAction.REMOVE: {
+    case SendBirdSyncManager.ChannelCollection.Action.REMOVE: {
       break;
     }
-    case ChannelEventAction.MOVE: {
+    case SendBirdSyncManager.ChannelCollection.Action.MOVE: {
       break;
     }
-    case ChannelEventAction.CLEAR: {
+    case SendBirdSyncManager.ChannelCollection.Action.CLEAR: {
       break;
     }
   }
@@ -99,31 +97,25 @@ collection.removeCollectionHandler();
 And data fetcher. Fetched channels would be delivered to event subscriber. Event fetcher determines the `action` automatically so you don't have to consider duplicated data in view.
 
 ```js
-collection.fetch(err => {
+collection.fetch(() => {
   // This callback is optional and useful to catch the moment of loading ended.
 });
 ```
 
 #### MessageCollection
 
-Message is relatively static data and SyncManager supports full-caching for messages. `MessageCollection` conducts background sync so that it synchronizes all the messages until it reaches to the end. Background sync does NOT affect view directly but sync local cache. For view update, explicitly call `fetch()` which fetches data from cache and sends the data into collection handler.
+Message is relatively static data and SyncManager supports full-caching for messages. `MessageCollection` conducts background sync so that it synchronizes all the messages until it reaches to the end. Background sync does NOT affect view but sync local cache. For view update, explicitly call `fetch()` which fetches data from cache and sends the data into event handler.
 
 Background sync ceases if the sync is done or sync request is failed.
 
-> Note: Background sync is not in actual background process as JavaScript runs single-threaded. But it does the work concurrently as if it is doing in background.
+> Note: Background sync is not in actual background process as JavaScript is running single-threaded. But it does the work concurrently as if it is doing in background.
 
 For various viewpoint support, `MessageCollection` sets starting point of view (or `viewpointTimestamp`) at creation. The `viewpointTimestamp` is a timestamp to start background sync in both previous and next direction (and also the point where a user sees at first). Here's the code to create `MessageCollection`.
 
 ```js
-const filter = {
-  messageTypeFilter: messageTypeFilter,
-  customTypeFilter: customTypeFilter,
-  senderUserIdsFilter: senderUserIdsFilter
-};
-const viewpointTimestamp = getLastReadTimestamp();
-// or new Date().getTime() if you want to see the most recent messages
-
-const collection = new SendBirdSyncManager.MessageCollection(channel, filter, viewpointTimestamp);
+const filter = createFilter(); // setup filter
+const ts = getLastReadTimestamp(); // or new Date().getTime() if you want to see the most recent messages
+const collection = new SendBirdSyncManager.MessageCollection(channel, filter, ts);
 ```
 
 You can dismiss collection when the collection is obsolete and no longer used.
@@ -132,24 +124,23 @@ You can dismiss collection when the collection is obsolete and no longer used.
 collection.remove();
 ```
 
-`MessageCollection` has event handler that you can implement and add to the collection. Event handler is named as `CollectionHandler` and it receives `action` and `message` when an event has come. The `action` is a keyword to notify what happened to the channel, and the `item` is the target `sb.BaseMessage` instance.
+`MessageCollection` has event subscriber. You can create an instance and implement the event handler and add it to the collection. Event subscriber is named as `CollectionHandler` and event handler receives `action` and `message` when an event has come. The `action` is a keyword to notify what happened to the channel, and the `item` is the target `sb.BaseMessage` instance.
 
 ```js
-const MessageEventAction = SendBirdSyncManager.MessageCollection.Action;
 const collectionHandler = new SendBirdSyncManager.MessageCollection.CollectionHandler();
-collectionHandler.onMessageEvent = (action, message) => {
+collectionHandler.onMessageEvent = (action, messages) => {
   // apply each event to view here
   switch(action) {
-    case MessageEventAction.INSERT: {
+    case SendBirdSyncManager.MessageCollection.Action.INSERT: {
       break;
     }
-    case MessageEventAction.UPDATE: {
+    case SendBirdSyncManager.MessageCollection.Action.UPDATE: {
       break;
     }
-    case MessageEventAction.REMOVE: {
+    case SendBirdSyncManager.MessageCollection.Action.REMOVE: {
       break;
     }
-    case MessageEventAction.CLEAR: {
+    case SendBirdSyncManager.MessageCollection.Action.CLEAR: {
       break;
     }
   }
@@ -171,7 +162,7 @@ collection.fetch('next', err => {
 });
 ```
 
-Fetched messages would be delivered to event handler. Event fetcher determines the `action` automatically so you don't have to consider duplicated data in view.
+Fetched messages would be delivered to event subscriber. Event fetcher determines the `action` automatically so you don't have to consider duplicated data in view.
 
 #### Handling uncaught messages
 
@@ -184,9 +175,6 @@ params.message = 'your message';
 const previewMessage = channel.sendUserMessage(params, (message, err) => {
   if(!err) {
     collection.appendMessage(message);
-  } else {
-    // delete preview message if sending message fails
-    collection.deleteMessage(previewMessage);
   }
 });
 collection.appendMessage(previewMessage);
@@ -201,7 +189,7 @@ channel.updateUserMessage(message.messageId, params, (message, err) => {
 });
 ```
 
-It works only for messages sent by `currentUser` which means the message sender should be `currentUser`.
+Once it is delivered to a collection, it'd not only apply the change into the current collection but also propagate the event into other collections so that the change could apply to other views automatically. It works only for messages sent by `currentUser` which means the message sender should be `currentUser`.
 
 ### Connection Lifecycle
 

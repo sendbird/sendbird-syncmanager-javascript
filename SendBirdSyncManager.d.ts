@@ -54,7 +54,7 @@ interface ChannelCollectionHandlerStatic {
   new (): ChannelCollectionHandler;
 }
 interface ChannelCollectionHandler {
-  onChannelEvent(action: ChannelEventAction, channel: GroupChannel): void;
+  onChannelEvent(action: ChannelEventAction, channels: Array<GroupChannel>): void;
 }
 
 // MessageManager
@@ -94,5 +94,5 @@ interface MessageCollectionHandlerStatic {
   new (): MessageCollectionHandler;
 }
 interface MessageCollectionHandler {
-  onMessageEvent(action: MessageEventAction, message: Message): void;
+  onMessageEvent(action: MessageEventAction, messages: Array<Message>): void;
 }
