@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## v1.1.0(MAR 15, 2019)
+ * Added channel full-sync support
+ * Stabilized and improved performance
+
 ## v1.0.2(FEB 25, 2019)
  * Updated collection handler parameters
  * Minor bug-fixes

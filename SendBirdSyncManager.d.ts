@@ -17,6 +17,7 @@ interface SendBirdSyncManagerStatic {
   ChannelCollection: ChannelCollectionStatic;
   MessageCollection: MessageCollectionStatic;
   
+  setup(userId: string): Promise;
   setup(userId: string, callback:(err: Error) => void): void;
   getInstance(): SendBirdSyncManagerInstance;
 }
@@ -25,7 +26,8 @@ interface SendBirdSyncManagerInstance {
 
   resumeSync(): void;
   pauseSync(): void;
-  clearCache(): void;
+  clearCache(): Promise;
+  clearCache(callback:(err: Error) => void): void;
 }
 
 // ChannelManager
@@ -38,7 +40,8 @@ interface ChannelCollection {
   channels: Array<GroupChannel>;
   query: SendBird.GroupChannelListQuery;
 
-  fetch(callback?:() => void): void;
+  fetch(): Promise;
+  fetch(callback:(err: Error) => void): void;
   remove(): void;
   setCollectionHandler(handler:ChannelCollectionHandler): void;
   removeCollectionHandler(): void;
@@ -74,7 +77,8 @@ interface MessageCollection {
   limit:number;
   messages: Array<Message>;
 
-  fetch(direction: 'prev' | 'next', callback?: (err: Error) => void): void;
+  fetch(direction: 'prev' | 'next'): Promise;
+  fetch(direction: 'prev' | 'next', callback: (err: Error) => void): void;
   resetViewpointTimestamp(viewpointTimestamp: number): void;
   remove(): void;
   
