@@ -42,10 +42,10 @@ To meet the purpose, each collection has event subscriber and data fetcher. Even
 
 #### ChannelCollection
 
-Channel is frequently mutable data where chat is actively going - channel's last message and unread message count may update very often. Even the position of each channel is changing drastically since many apps sort channels by the most recent message. In that context, `ChannelCollection` manages synchronization like below:
+Channel is mutable data where chat is actively going on - channel's last message and unread message count may update very often. Even the position of each channel is changing drastically since many apps sort channels by the most recent message. In that context, `ChannelCollection` manages synchronization as below:
 
 1. Channel collection fulfills full channel sync (one-time) and change log sync when a collection is created.
-   - Full channel sync fetches all channels which match with query. Once full channel sync reaches to the end, it doesn't do it again later.
+   - Full channel sync fetches all channels which match with query. Once the full channel sync reaches to the end, it doesn't do it again later.
    - Change log sync fetches the changes of all channels so that the cache could be up-to-date. The channels fetched by change log sync may get delivered to collection handler if they're supposed to.
 2. Then `fetch()` loads channels from cache to show them in the view.
 3. (Optional) If fetched channels are not enough (i.e. the number of fetched channels is less than `limit`) and full channel sync is running, then it waits for full channel sync to end. Once the full channel sync is done with the current request, it loads rest of channels from cache.
