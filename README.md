@@ -24,12 +24,18 @@ import SendBirdSyncManager from 'sendbird-syncmanager';
 const sb = new SendBird({ appId: YOUR_APP_ID });
 ...
 
+// uncomment if you're using SyncManager in React Native
+// import { AsyncStorage } from 'react-native'
+// SendBirdSyncManager.useReactNative(AsyncStorage);
+
 // sb doesn't have to be connected to initialize SyncManager.
 SendBirdSyncManager.sendBird = sb;
 SendBirdSyncManager.setup(USER_ID, () => {
   // do your job here
 });
 ```
+
+> SyncManager version >=1.1.2 officially supports React Native. It contains internal local database engine using AsyncStorage. For reducing the size of the integrated package and avoiding collision of versions, the SyncManager SDK doesn't have dependency with `react-native` package. Please import `AsyncStorage` for your own and call `SendBirdSyncManager.useReactNative(AsyncStorage)` before `setup()` in order to use SyncManager in React Native.
 
 ### Collection
 

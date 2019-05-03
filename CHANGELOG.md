@@ -1,8 +1,12 @@
 Changelog
 =========
 
+## v1.1.2(MAY 3, 2019)
+ * React Native support
+ * Improved stability
+
 ## v1.1.1(APR 3, 2019)
- * Improved stabilization
+ * Improved stability
 
 ## v1.1.0(MAR 19, 2019)
  * Added channel full-sync support
