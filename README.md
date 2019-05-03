@@ -1,5 +1,5 @@
 
-# SendBird SyncManager for Web
+# SendBird SyncManager for JavaScript
 
 SendBird SyncManager is chat data sync management add-on for SendBird. SyncManager offers an event-based data management framework so that each view would listen data event in event handler in order to update the view. And it stores the data into IndexedDB or equivalent storage engine which implements local caching for faster loading.
 
