@@ -18,7 +18,7 @@ interface SendBirdSyncManagerStatic {
   MessageCollection: MessageCollectionStatic;
   
   setup(userId: string): Promise<void>;
-  setup(userId: string, callback:(err: Error) => void): void;
+  setup(userId: string, callback: ErrorCallback): void;
   getInstance(): SendBirdSyncManagerInstance;
   useReactNative(AsyncStorage: object): void;
 }
@@ -28,9 +28,9 @@ interface SendBirdSyncManagerInstance {
   resumeSync(): void;
   pauseSync(): void;
   clearCache(): Promise<void>;
-  clearCache(callback:(err: Error) => void): void;
+  clearCache(callback: ErrorCallback): void;
   reset(): Promise<void>;
-  reset(callback: (err: Error) => void): void;
+  reset(callback: ErrorCallback): void;
 }
 
 // ChannelManager
@@ -44,7 +44,7 @@ interface ChannelCollection {
   query: SendBird.GroupChannelListQuery;
 
   fetch(): Promise<void>;
-  fetch(callback:(err: Error) => void): void;
+  fetch(callback: ErrorCallback): void;
   remove(): void;
   setCollectionHandler(handler:ChannelCollectionHandler): void;
   removeCollectionHandler(): void;
@@ -73,6 +73,11 @@ interface MessageCollectionStatic {
   new (channel:GroupChannel, filter:MessageFilter, viewpointTimestamp?:number): MessageCollection;
   Action: MessageEventAction;
   CollectionHandler: MessageCollectionHandlerStatic;
+  
+  create(channelUrl: string, filter: MessageFilter, callback: MessageCollectionCallback): void;
+  create(channelUrl: string, filter: MessageFilter, viewpointTimestamp:number, callback: MessageCollectionCallback): void;
+  create(channelUrl: string, filter: MessageFilter): Promise<GroupChannel>;
+  create(channelUrl: string, filter: MessageFilter, viewpointTimestamp:number): Promise<GroupChannel>;
 }
 interface MessageCollection {
   channel: GroupChannel;
@@ -81,7 +86,7 @@ interface MessageCollection {
   messages: Array<Message>;
 
   fetch(direction: 'prev' | 'next'): Promise<void>;
-  fetch(direction: 'prev' | 'next', callback: (err: Error) => void): void;
+  fetch(direction: 'prev' | 'next', callback: ErrorCallback): void;
   resetViewpointTimestamp(viewpointTimestamp: number): void;
   remove(): void;
   
@@ -103,3 +108,7 @@ interface MessageCollectionHandlerStatic {
 interface MessageCollectionHandler {
   onMessageEvent(action: MessageEventAction, messages: Array<Message>): void;
 }
+
+// callback
+type ErrorCallback = (err: Error) => void;
+type MessageCollectionCallback = (err: Error, collection: MessageCollection) => void;

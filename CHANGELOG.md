@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## v1.1.3(MAY 10, 2019)
+ * Added `MessageCollection.create()`
+   * To create message collection with channelUrl
+ * Improved stabilibty
+
 ## v1.1.2(MAY 3, 2019)
  * React Native support
  * Improved stability
