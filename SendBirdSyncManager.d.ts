@@ -91,7 +91,8 @@ interface MessageCollection {
   remove(): void;
   
   appendMessage(message:Message): void;
-  replaceMessage(message:Message): void;
+  updateMessage(message:Message): void;
+  deleteMessage(message:Message): void;
 
   setCollectionHandler(handler:MessageCollectionHandler): void;
   removeCollectionHandler(): void;

@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## v1.1.5(MAY 23, 2019)
+ * TypeScript interface fix
+ * Improved stability
+
 ## v1.1.4(MAY 20, 2019)
  * Improved stability
 
