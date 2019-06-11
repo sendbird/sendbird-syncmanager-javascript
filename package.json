@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/smilefam/sendBird-syncmanager-javaScript.git"
+    "url": "git+https://github.com/sendbird/sendBird-syncmanager-javaScript.git"
   },
   "author": "SendBird <support@sendbird.com>",
   "license": "SEE LICENSE IN LICENSE.md",
   "bugs": {
-    "url": "https://github.com/smilefam/sendBird-syncmanager-javaScript/issues"
+    "url": "https://github.com/sendbird/sendBird-syncmanager-javaScript/issues"
   },
   "homepage": "https://sendbird.com",
   "typings": "SendBirdSyncManager.d.ts",
