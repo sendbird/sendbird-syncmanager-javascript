@@ -12,16 +12,36 @@ type Message = UserMessage | FileMessage | AdminMessage;
 
 declare const SendBirdSyncManager: SendBirdSyncManagerStatic;
 
+declare enum LogLevelEnum { NONE = 0, ERROR = 1 }
 interface SendBirdSyncManagerStatic {
   sendBird: SendBird.SendBirdInstance;
   ChannelCollection: ChannelCollectionStatic;
   MessageCollection: MessageCollectionStatic;
+
+  Options: SyncManagerOptionsStatic;
+  syncManagerOptions: SyncManagerOptions;
+
+  LogLevel: LogLevelEnum;
+  loggerLevel: number;
   
   setup(userId: string): Promise<void>;
+  setup(userId: string, options: SyncManagerOptions): Promise<void>;
   setup(userId: string, callback: ErrorCallback): void;
+  setup(userId: string, options: SyncManagerOptions, callback: ErrorCallback): void;
   getInstance(): SendBirdSyncManagerInstance;
   useReactNative(AsyncStorage: object): void;
 }
+declare enum MessageResendPolicy {
+  NONE = 'none'
+}
+interface SyncManagerOptions {
+  messageCollectionCapacity: number;
+  messageResendPolicy: MessageResendPolicy;
+}
+interface SyncManagerOptionsStatic {
+  new (): SyncManagerOptions
+}
+
 interface SendBirdSyncManagerInstance {
   currentUserId: string;
 
@@ -35,7 +55,7 @@ interface SendBirdSyncManagerInstance {
 
 // ChannelManager
 interface ChannelCollectionStatic {
-  new (query:SendBird.GroupChannelListQuery): ChannelCollection;
+  new (query: SendBird.GroupChannelListQuery): ChannelCollection;
   Action: ChannelEventAction;
   CollectionHandler: ChannelCollectionHandlerStatic;
 }
@@ -70,31 +90,34 @@ interface MessageFilter {
   senderUserIdsFilter: Array<string>;
 }
 interface MessageCollectionStatic {
-  new (channel:GroupChannel, filter:MessageFilter, viewpointTimestamp?:number): MessageCollection;
+  new (channel: GroupChannel, filter?: MessageFilter, viewpointTimestamp?: number): MessageCollection;
   Action: MessageEventAction;
   CollectionHandler: MessageCollectionHandlerStatic;
   
   create(channelUrl: string, filter: MessageFilter, callback: MessageCollectionCallback): void;
-  create(channelUrl: string, filter: MessageFilter, viewpointTimestamp:number, callback: MessageCollectionCallback): void;
+  create(channelUrl: string, filter: MessageFilter, viewpointTimestamp: number, callback: MessageCollectionCallback): void;
   create(channelUrl: string, filter: MessageFilter): Promise<GroupChannel>;
-  create(channelUrl: string, filter: MessageFilter, viewpointTimestamp:number): Promise<GroupChannel>;
+  create(channelUrl: string, filter: MessageFilter, viewpointTimestamp: number): Promise<GroupChannel>;
 }
 interface MessageCollection {
   channel: GroupChannel;
   filter: MessageFilter;
-  limit:number;
+  limit: number;
   messages: Array<Message>;
+  messageCount: number;
 
   fetch(direction: 'prev' | 'next'): Promise<void>;
   fetch(direction: 'prev' | 'next', callback: ErrorCallback): void;
   resetViewpointTimestamp(viewpointTimestamp: number): void;
   remove(): void;
   
-  appendMessage(message:Message): void;
-  updateMessage(message:Message): void;
-  deleteMessage(message:Message): void;
+  handleSendMessageResponse(err: Error, message: Message): void;
 
-  setCollectionHandler(handler:MessageCollectionHandler): void;
+  appendMessage(message:Message): void; // DEPRECATED
+  updateMessage(message:Message): void; // DEPRECATED
+  deleteMessage(message:Message): void; // DEPRECATED
+
+  setCollectionHandler(handler: MessageCollectionHandler): void;
   removeCollectionHandler(): void;
 }
 declare enum MessageEventAction {
