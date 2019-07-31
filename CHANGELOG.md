@@ -1,6 +1,18 @@
 Changelog
 =========
 
+## v1.1.7(JUL 31, 2019)
+ * Added `fetchFailedMessages` in `MessageCollection` to retrieve FailedMessages.  
+ * Added `fetchSucceededMessages` in `MessageCollection` to retrieve SucceededMessages.  
+ * Deprecated `onMessageEvent` in `CollectionHandler`.    
+ * Added `onPendingMessageEvent` in `CollectionHandler` to notify about PendingMessage.  
+ * Added `onFailedMessageEvent` in `CollectionHandler` to notify about FailedMessage.  
+ * Added `onSucceededMessageEvent` in `CollectionHandler` to notify about SucceededMessage.  
+ * Added `onNewMessage` in `CollectionHandler` to inform there is a new message.
+ * Added `automaticMessageResendRetryCount` in `SendBirdSyncManager.Options` to set count of retry.  
+ * Added `maxFailedMessageCountPerChannel` in `SendBirdSyncManager.Options` to set maximum count of FailedMessage stored local DB.  
+ * Added `failedMessageRetentionDays` in `SendBirdSyncManager.Options` to set days of message retention.  
+ 
 ## v1.1.6(JUN 12, 2019)
  * Added `SendBirdSyncManager.Options` which is used for message count limit of `MessageCollection` and message resend policy.   
  * Added `handleSendMessageResponse()` in `MessageCollection` to support resend failed message.  

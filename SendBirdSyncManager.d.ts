@@ -1,4 +1,3 @@
-
 import SendBird from 'sendbird';
 
 export = SendBirdSyncManager;
@@ -12,7 +11,10 @@ type Message = UserMessage | FileMessage | AdminMessage;
 
 declare const SendBirdSyncManager: SendBirdSyncManagerStatic;
 
-declare enum LogLevelEnum { NONE = 0, ERROR = 1 }
+declare enum LogLevelEnum {
+  NONE = 0,
+  ERROR = 1
+}
 interface SendBirdSyncManagerStatic {
   sendBird: SendBird.SendBirdInstance;
   ChannelCollection: ChannelCollectionStatic;
@@ -23,7 +25,7 @@ interface SendBirdSyncManagerStatic {
 
   LogLevel: LogLevelEnum;
   loggerLevel: number;
-  
+
   setup(userId: string): Promise<void>;
   setup(userId: string, options: SyncManagerOptions): Promise<void>;
   setup(userId: string, callback: ErrorCallback): void;
@@ -32,14 +34,19 @@ interface SendBirdSyncManagerStatic {
   useReactNative(AsyncStorage: object): void;
 }
 declare enum MessageResendPolicy {
-  NONE = 'none'
+  NONE = 'none',
+  MANUAL = 'manual',
+  AUTOMATIC = 'automatic'
 }
 interface SyncManagerOptions {
   messageCollectionCapacity: number;
   messageResendPolicy: MessageResendPolicy;
+  automaticMessageResendRetryCount: number;
+  maxFailedMessageCountPerChannel: number;
+  failedMessageRetentionDays: number;
 }
 interface SyncManagerOptionsStatic {
-  new (): SyncManagerOptions
+  new (): SyncManagerOptions;
 }
 
 interface SendBirdSyncManagerInstance {
@@ -66,7 +73,7 @@ interface ChannelCollection {
   fetch(): Promise<void>;
   fetch(callback: ErrorCallback): void;
   remove(): void;
-  setCollectionHandler(handler:ChannelCollectionHandler): void;
+  setCollectionHandler(handler: ChannelCollectionHandler): void;
   removeCollectionHandler(): void;
 }
 declare enum ChannelEventAction {
@@ -92,10 +99,16 @@ interface MessageFilter {
 interface MessageCollectionStatic {
   new (channel: GroupChannel, filter?: MessageFilter, viewpointTimestamp?: number): MessageCollection;
   Action: MessageEventAction;
+  FailedMessageEventActionReason: FailedMessageEventActionReason;
   CollectionHandler: MessageCollectionHandlerStatic;
-  
+
   create(channelUrl: string, filter: MessageFilter, callback: MessageCollectionCallback): void;
-  create(channelUrl: string, filter: MessageFilter, viewpointTimestamp: number, callback: MessageCollectionCallback): void;
+  create(
+    channelUrl: string,
+    filter: MessageFilter,
+    viewpointTimestamp: number,
+    callback: MessageCollectionCallback
+  ): void;
   create(channelUrl: string, filter: MessageFilter): Promise<GroupChannel>;
   create(channelUrl: string, filter: MessageFilter, viewpointTimestamp: number): Promise<GroupChannel>;
 }
@@ -103,19 +116,29 @@ interface MessageCollection {
   channel: GroupChannel;
   filter: MessageFilter;
   limit: number;
-  messages: Array<Message>;
+
+  messages: Array<Message>; // DEPRECATED
+  succeededMessages: Array<Message>;
+  failedMessages: Array<Message>;
   messageCount: number;
 
-  fetch(direction: 'prev' | 'next'): Promise<void>;
-  fetch(direction: 'prev' | 'next', callback: ErrorCallback): void;
+  fetch(direction: 'prev' | 'next'): Promise<void>; // DEPRECATED
+  fetch(direction: 'prev' | 'next', callback: ErrorCallback): void; // DEPRECATED
+
+  fetchFailedMessages(): Promise<void>;
+  fetchFailedMessages(callback: ErrorCallback): void;
+  fetchSucceededMessages(): Promise<void>;
+  fetchSucceededMessages(callback: ErrorCallback): void;
+
   resetViewpointTimestamp(viewpointTimestamp: number): void;
   remove(): void;
-  
+
   handleSendMessageResponse(err: Error, message: Message): void;
 
-  appendMessage(message:Message): void; // DEPRECATED
-  updateMessage(message:Message): void; // DEPRECATED
-  deleteMessage(message:Message): void; // DEPRECATED
+  hasMessage(message: Message): boolean;
+  appendMessage(message: Message): void;
+  updateMessage(message: Message): void;
+  deleteMessage(message: Message): void;
 
   setCollectionHandler(handler: MessageCollectionHandler): void;
   removeCollectionHandler(): void;
@@ -126,11 +149,29 @@ declare enum MessageEventAction {
   REMOVE = 'remove',
   CLEAR = 'clear'
 }
+declare enum FailedMessageEventActionReason {
+  NONE = 'none',
+  UPDATE_RESEND_FAILED = 'update_resend_failed',
+  REMOVE_RESEND_SUCCEEDED = 'remove_resend_succeeded',
+  REMOVE_RETENTION_EXPIRED = 'remove_retention_expired',
+  REMOVE_EXCEEDED_MAX_COUNT = 'remove_exceeded_max_count',
+  REMOVE_MANUAL_ACTION = 'remove_manual_action',
+  REMOVE_UNKNOWN = 'remove_unknown'
+}
 interface MessageCollectionHandlerStatic {
   new (): MessageCollectionHandler;
 }
 interface MessageCollectionHandler {
-  onMessageEvent(action: MessageEventAction, messages: Array<Message>): void;
+  onPendingMessageEvent(messages: Array<Message>, action: MessageEventAction): void;
+  onFailedMessageEvent(
+    messages: Array<Message>,
+    action: MessageEventAction,
+    reason: FailedMessageEventActionReason
+  ): void;
+  onSucceededMessageEvent(messages: Array<Message>, action: MessageEventAction): void;
+  onNewMessage(message: Message): void;
+
+  onMessageEvent(action: MessageEventAction, messages: Array<Message>): void; // DEPRECATED
 }
 
 // callback
