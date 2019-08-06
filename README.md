@@ -37,6 +37,31 @@ SendBirdSyncManager.setup(USER_ID, () => {
 
 > SyncManager version >=1.1.2 officially supports React Native. It contains internal local database engine using AsyncStorage. For reducing the size of the integrated package and avoiding collision of versions, the SyncManager SDK doesn't have dependency with `react-native` package. Please import `AsyncStorage` for your own and call `SendBirdSyncManager.useReactNative(AsyncStorage)` before `setup()` in order to use SyncManager in React Native.
 
+### Global Options
+
+You can set global options for operational configurations. Here is the list of the options.
+
+| Option                           | Type   | Description                                                                                                                                                                                                                                                                                                                                                                                           |
+| :------------------------------- | :----- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| messageCollectionCapacity        | Number | Limit the number of messages in a collection. If set, collection holds that number of messages in memory and invokes `remove` event for the messages trimmed out. (default: 1,000, minimum: 200)                                                                                                                                                                                                      |
+| messageResendPolicy              | String | The policy to resend messages that failed to be sent. 1) `'none'` does not save failed messages into cache and just removes the failed message from view. 2) `'manual'` saves failed messages into cache but doesn't resend them automatically. 3) `'automatic'` saves failed messages and also resend them when sync resumes or the failed messages are fetched from cache. (default: `'automatic'`) |
+| automaticMessageResendRetryCount | Number | Set the retry count of automatic resend. Once the number of failures in resending message reaches to it, the message remains as failed message and not going to get resent again. Only available when `messageResentPolicy` is set to `automatic`. (default: `Infinity`)                                                                                                                              |
+| maxFailedMessageCountPerChannel  | Number | Set the maximum number of failed messages allowed in a channel. If the number of failed messages exceeds the count, the oldest failed message would get trimmed out. (default: `Infinity`)                                                                                                                                                                                                            |
+| failedMessageRetentionDays       | Number | Set the number of days to retain failed messages. Failed messages which pass the retension period since its creation will be removed automatically. (default: `7`)                                                                                                                                                                                                                                    |
+
+You can initialize SyncManager with options like below:
+
+```js
+const options = new SendBirdSyncManager.Options();
+options.messageCollectionCapacity = 2000;
+options.messageResendPolicy = 'manual';
+options.maxFailedMessageCountPerChannel = 5;
+
+SendBirdSyncManager.setup(USER_ID, options, () => {
+  // do your job here
+});
+```
+
 ### Collection
 
 Collection is a component to manage data related to a single view. `ChannelCollection` and `MessageCollection` are attached to channel list view and message list view (or chat view) accordingly. The main purpose of Collection is,
@@ -44,17 +69,17 @@ Collection is a component to manage data related to a single view. `ChannelColle
 - To listen data event and deliver it as view event.
 - To fetch data from cache or SendBird server and deliver the data as view event.
 
-To meet the purpose, each collection has event subscriber and data fetcher. Event subscriber listens data event so that it could apply data update into view, and data fetcher loads data from cache or server and sends the data to event handler.
+To meet the purpose, each collection has event subscriber and data fetcher. Event subscriber listens data event so that it could apply data update into view, and data fetcher loads data from cache and sends the data to event handler.
 
 #### ChannelCollection
 
-Channel is mutable data where chat is actively going on - channel's last message and unread message count may update very often. Even the position of each channel is changing drastically since many apps sort channels by the most recent message. In that context, `ChannelCollection` manages synchronization as below:
+Channel is frequently mutable data where chat is actively going - channel's last message and unread message count may update very often. Even the position of each channel is changing drastically since many apps sort channels by the most recent message. In that context, `ChannelCollection` manages synchronization like below:
 
 1. Channel collection fulfills full channel sync (one-time) and change log sync when a collection is created.
-   - Full channel sync fetches all channels which match with query. Once the full channel sync reaches to the end, it doesn't do it again later.
+   - Full channel sync fetches all channels which match with query. Once full channel sync reaches to the end, it doesn't do it again later.
    - Change log sync fetches the changes of all channels so that the cache could be up-to-date. The channels fetched by change log sync may get delivered to collection handler if they're supposed to.
 2. Then `fetch()` loads channels from cache to show them in the view.
-3. (Optional) If fetched channels are not enough (i.e. the number of fetched channels is less than `limit`) and full channel sync is running, then it waits for full channel sync to end. Once the full channel sync is done with the current request, it loads rest of channels from cache.
+3. (Optional) If fetch()-ed channels from cache are not enough (i.e. the number of fetched channels is less than `limit`) and full channel sync is running, then it waits for full channel sync to complete the current request. Once the full channel sync is done with the current request, it loads rest of channels from cache.
 
 `ChannelCollection` requires `sb.GroupChannelListQuery` instance as it binds the query into the collection. Then the collection filters data with the query. Here's the code to create new `ChannelCollection` instance.
 
@@ -113,7 +138,7 @@ collection.fetch(() => {
 
 #### MessageCollection
 
-Message is relatively static data and SyncManager supports full-caching for messages. `MessageCollection` conducts background message sync so that it synchronizes all the messages until it reaches to the end. Background sync does NOT affect view but local cache. For view update, explicitly call `fetch()` which fetches data from cache and sends the data into event handler.
+Message is relatively static data and SyncManager supports full-caching for messages. `MessageCollection` conducts background message sync so that it synchronizes all the messages until it reaches to the end. Background sync does NOT affect view but local cache. For view update, explicitly call `fetchSucceededMessages()` which fetches data from cache and sends the data into event handler.
 
 Background sync ceases if the sync is done or sync request is failed.
 
@@ -133,11 +158,48 @@ You can dismiss collection when the collection is obsolete and no longer used.
 collection.remove();
 ```
 
+Regarding on sending a message, `MessageCollection` manages it along with the request lifecycle. Each message has `requestState` property which indicates the send request state.
+
+| State     | Description                                                                                                                                                                                                                                          |
+| :-------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| pending   | The message returned by calling `sendUserMessage()` or `sendFileMessage()`. This message is waiting for the response to fix the final state of the message - `'failed'` or `'succeeded'`. Pending message is not stored in cache.                    |
+| failed    | The message failed to be sent and fallen to the callback with error. It would be sent again automatically if the `messageResendPolicy` is set to `'automatic'`. Otherwise, you can send it again via `resendUserMessage()` in SendBird SDK manually. |
+| succeeded | The message successfully sent.                                                                                                                                                                                                                       |
+
+> Note: Currently `requestState` property is only available in `UserMessage`.
+
+> Note: If `sendUserMessage()` fails due to invalid parameter, it doesn't yield a failed message but `null` instead, which means it'd not be queued for automatic resend.
+
 `MessageCollection` has event subscriber. You can create an instance and implement the event handler and add it to the collection. Event subscriber is named as `CollectionHandler` and event handler receives `action` and `message` when an event has come. The `action` is a keyword to notify what happened to the channel, and the `item` is the target `sb.BaseMessage` instance.
 
 ```js
 const collectionHandler = new SendBirdSyncManager.MessageCollection.CollectionHandler();
-collectionHandler.onMessageEvent = (action, messages) => {
+collectionHandler.onPendingMessageEvent = (messages, action) => {
+  // apply each event to view here
+  switch(action) {
+    case SendBirdSyncManager.MessageCollection.Action.INSERT: {
+      break;
+    }
+    case SendBirdSyncManager.MessageCollection.Action.REMOVE: {
+      break;
+    }
+  }
+};
+collectionHandler.onFailedMessageEvent = (messages, action) => {
+  // apply each event to view here
+  switch(action) {
+    case SendBirdSyncManager.MessageCollection.Action.INSERT: {
+      break;
+    }
+    case SendBirdSyncManager.MessageCollection.Action.UPDATE: {
+      break;
+    }
+    case SendBirdSyncManager.MessageCollection.Action.REMOVE: {
+      break;
+    }
+  }
+};
+collectionHandler.onSucceededMessageEvent = (messages, action) => {
   // apply each event to view here
   switch(action) {
     case SendBirdSyncManager.MessageCollection.Action.INSERT: {
@@ -154,6 +216,14 @@ collectionHandler.onMessageEvent = (action, messages) => {
     }
   }
 };
+collectionHandler.onNewMessage = message => {
+  // new message has arrived but it's not continuous with the messages in the collection.
+  // for example, suppose that you have messages [ A, B, C, D, E ] in a channel. (A is the oldest one).
+  // and the collection has [ A, B, C ] which means the user sees the messages [ A, B, C ] (D, E are not shown yet).
+  // if new message F is made, it'd be awkward to show [ A, B, C, F ] because there are some messages inbetween.
+  // in that scenario, SyncManager invokes onNewMessage for the message F instead of onSucceededMessageEvent
+  // so that you'd show the user that new message has arrived rather than attaches the message to the view.
+};
 collection.setCollectionHandler(collectionHandler);
 
 // you can cancel event subscription by calling unsubscribe() like:
@@ -163,10 +233,18 @@ collection.removeCollectionHandler();
 `MessageCollection` has data fetcher by direction: `prev` and `next`. It fetches data from cache only and never request to server. If no more data is available in a certain direction, it subscribes the background sync internally and fetches the synced messages right after the sync progresses.
 
 ```js
-collection.fetch('prev', err => {
+collection.fetchSucceededMessages('prev', err => {
   // Fetching from cache is done
 });
-collection.fetch('next', err => {
+collection.fetchSucceededMessages('next', err => {
+  // Fetching from cache is done
+});
+```
+
+Or you'd like to fetch all failed messages.
+
+```js
+collection.fetchFailedMessages(err => {
   // Fetching from cache is done
 });
 ```
@@ -187,15 +265,13 @@ collection.resetViewpointTimestamp(ts);
 SyncManager listens message event such as `onMessageReceived` and `onMessageUpdated`, and applies the change automatically. But they would not be called if the message is sent by `currentUser`. You can keep track of the message by calling related function when the `currentUser` sends or updates message. `MessageCollection` provides methods to apply the message event to collections.
 
 ```js
-// call collection.appendMessage() after sending message
+// call collection.handleSendMessageResponse() after sending message
 const params = new sb.UserMessageParams();
 params.message = 'your message';
-const previewMessage = channel.sendUserMessage(params, (message, err) => {
-  if(!err) {
-    collection.appendMessage(message);
-  }
+const pendingMessage = channel.sendUserMessage(params, (message, err) => {
+  collection.handleSendMessageResponse(err, message);
 });
-collection.appendMessage(previewMessage);
+collection.appendMessage(pendingMessage);
 
 // call collection.updateMessage() after updating message
 const params = new sb.UserMessageParams();
@@ -235,24 +311,7 @@ connectionHandler.onReconnectSucceeded = () => {
 sb.addConnectionHandler(UNIQUE_CONNECTION_HANDLER_KEY, connectionHandler);
 ```
 
-`ConnectionHandler` cannot detect the moment you call `connect()` or `disconnect()`. If you need to check it manually in case you call `connect()` and `disconnect()` explicitly, use an interval timer instead in order to detect connection state change.
-
-```js
-const manager = SendBirdSyncManager.getInstance();
-let currentConnectionStatus = sb.getConnectionState();
-setInterval(() => {
-  const latestConnectionStatus = sb.getConnectionState();
-  if(currentConnectionStatus !== sb.ConnectionState.CLOSED
-    && latestConnectionStatus === sb.ConnectionState.CLOSED) {
-    manager.pauseSync();
-  } else if(currentConnectionStatus !== sb.ConnectionState.OPEN
-    && latestConnectionStatus === sb.ConnectionState.OPEN) {
-    manager.resumeSync();
-  }
-  currentConnectionStatus = latestConnectionStatus;
-},
-CONNECTION_CHECK_INTERVAL);
-```
+`ConnectionHandler` cannot detect the moment you call `connect()` or `disconnect()`. You need to check it manually in case you call `connect()` and `disconnect()` explicitly.
 
 ### Cache clear
 
