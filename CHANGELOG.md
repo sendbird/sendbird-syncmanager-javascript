@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## v1.1.8(SEP 6, 2019)
+ * Improved stability  
+ 
 ## v1.1.7(JUL 31, 2019)
  * Added `fetchFailedMessages` in `MessageCollection` to retrieve FailedMessages.  
  * Added `fetchSucceededMessages` in `MessageCollection` to retrieve SucceededMessages.  
