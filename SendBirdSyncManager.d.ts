@@ -1,15 +1,17 @@
 import SendBird from 'sendbird';
 
-export = SendBirdSyncManager;
-export as namespace SendBirdSyncManager;
-
 type GroupChannel = SendBird.GroupChannel;
 type UserMessage = SendBird.UserMessage;
 type FileMessage = SendBird.FileMessage;
 type AdminMessage = SendBird.AdminMessage;
 type Message = UserMessage | FileMessage | AdminMessage;
 
+export { SendBirdSyncManager, ChannelCollection, MessageCollection };
+export as namespace SendBirdSyncManager;
+
 declare const SendBirdSyncManager: SendBirdSyncManagerStatic;
+declare const ChannelCollection: ChannelCollectionStatic;
+declare const MessageCollection: MessageCollectionStatic;
 
 declare enum LogLevelEnum {
   NONE = 0,
@@ -62,11 +64,11 @@ interface SendBirdSyncManagerInstance {
 
 // ChannelManager
 interface ChannelCollectionStatic {
-  new (query: SendBird.GroupChannelListQuery): ChannelCollection;
+  new (query: SendBird.GroupChannelListQuery): ChannelCollectionInstance;
   Action: ChannelEventAction;
   CollectionHandler: ChannelCollectionHandlerStatic;
 }
-interface ChannelCollection {
+interface ChannelCollectionInstance {
   channels: Array<GroupChannel>;
   query: SendBird.GroupChannelListQuery;
 
@@ -97,7 +99,7 @@ interface MessageFilter {
   senderUserIdsFilter: Array<string>;
 }
 interface MessageCollectionStatic {
-  new (channel: GroupChannel, filter?: MessageFilter, viewpointTimestamp?: number): MessageCollection;
+  new (channel: GroupChannel, filter?: MessageFilter, viewpointTimestamp?: number): MessageCollectionInstance;
   Action: MessageEventAction;
   FailedMessageEventActionReason: FailedMessageEventActionReason;
   CollectionHandler: MessageCollectionHandlerStatic;
@@ -112,7 +114,7 @@ interface MessageCollectionStatic {
   create(channelUrl: string, filter: MessageFilter): Promise<GroupChannel>;
   create(channelUrl: string, filter: MessageFilter, viewpointTimestamp: number): Promise<GroupChannel>;
 }
-interface MessageCollection {
+interface MessageCollectionInstance {
   channel: GroupChannel;
   filter: MessageFilter;
   limit: number;
