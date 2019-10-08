@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## v1.1.10(OCT 8, 2019)
+ * Fixed Edge/IE incompatibility.
+ * Fixed a bug in `memberStateFilter`.
+ * Improved stability.
+
 ## v1.1.9(SEP 27, 2019)
  * Fixed TypeScript interface.
 
@@ -24,35 +29,35 @@ Changelog
  * Added `handleSendMessageResponse()` in `MessageCollection` to support resend failed message.  
 
 ## v1.1.5(MAY 23, 2019)
- * TypeScript interface fix
- * Improved stability
+ * TypeScript interface fix.
+ * Improved stability.
 
 ## v1.1.4(MAY 20, 2019)
- * Improved stability
+ * Improved stability.
 
 ## v1.1.3(MAY 10, 2019)
- * Added `MessageCollection.create()`
-   * To create message collection with channelUrl
- * Improved stability
+ * Added `MessageCollection.create()`.
+   * To create message collection with channelUrl.
+ * Improved stability.
 
 ## v1.1.2(MAY 3, 2019)
- * React Native support
- * Improved stability
+ * React Native support.
+ * Improved stability.
 
 ## v1.1.1(APR 3, 2019)
- * Improved stability
+ * Improved stability.
 
 ## v1.1.0(MAR 19, 2019)
- * Added channel full-sync support
- * Stabilized and improved performance
+ * Added channel full-sync support.
+ * Stabilized and improved performance.
 
 ## v1.0.2(FEB 25, 2019)
- * Updated collection handler parameters
- * Minor bug-fixes
+ * Updated collection handler parameters.
+ * Minor bug-fixes.
 
 ## v1.0.1(FEB 18, 2019)
- * Applied error code
- * Minor bug-fixes
+ * Applied error code.
+ * Minor bug-fixes.
 
 ## v1.0.0(FEB 8, 2019)
- * 1.0.0 release
+ * 1.0.0 release.

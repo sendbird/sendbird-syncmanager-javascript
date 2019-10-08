@@ -97,6 +97,7 @@ interface MessageFilter {
   messageTypeFilter: 0 | 1 | 2 | 3; // 0: ALL, 1: USER, 2: FILE, 3: ADMIN
   customTypeFilter: string;
   senderUserIdsFilter: Array<string>;
+  includeMetaArray: boolean;
 }
 interface MessageCollectionStatic {
   new (channel: GroupChannel, filter?: MessageFilter, viewpointTimestamp?: number): MessageCollectionInstance;
