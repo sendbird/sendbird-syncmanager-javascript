@@ -1,6 +1,6 @@
 {
   "name": "sendbird-syncmanager",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "SendBird data sync manager for JavaScript",
   "main": "SendBirdSyncManager.min.js",
   "scripts": {

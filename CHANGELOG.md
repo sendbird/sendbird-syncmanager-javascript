@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## v1.1.11(OCT 18, 2019)
+ * Fixed Edge/IE incompatibility.
+ * Improved stability.
+
 ## v1.1.10(OCT 8, 2019)
  * Fixed Edge/IE incompatibility.
  * Fixed a bug in `memberStateFilter`.

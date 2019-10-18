@@ -179,4 +179,4 @@ interface MessageCollectionHandler {
 
 // callback
 type ErrorCallback = (err: Error) => void;
-type MessageCollectionCallback = (err: Error, collection: MessageCollection) => void;
+type MessageCollectionCallback = (err: Error, collection: MessageCollectionInstance) => void;
