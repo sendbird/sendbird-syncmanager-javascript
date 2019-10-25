@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## v1.1.12(OCT 25, 2019)
+ * Critical bug-fix.
+
 ## v1.1.11(OCT 18, 2019)
  * Fixed Edge/IE incompatibility.
  * Improved stability.
