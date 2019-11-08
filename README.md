@@ -3,15 +3,14 @@
 
 SendBird SyncManager is chat data sync management add-on for SendBird. SyncManager offers an event-based data management framework so that each view would listen data event in event handler in order to update the view. And it stores the data into IndexedDB or equivalent storage engine which implements local caching for faster loading.
 
-## Requirement
-
-- Node.js v8.x+
-
-## Installation
+## Build
 
 ```
-npm install sendbird-syncmanager
+~$ npm install
+~$ npm run build
 ```
+
+> Note: SyncManager requires `Node.js` v8.x+ installed to build.
 
 ## How It Works
 
@@ -41,13 +40,13 @@ SendBirdSyncManager.setup(USER_ID, () => {
 
 You can set global options for operational configurations. Here is the list of the options.
 
-| Option                           | Type   | Description                                                                                                                                                                                                                                                                                                                                                                                           |
-| :------------------------------- | :----- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| messageCollectionCapacity        | Number | Limit the number of messages in a collection. If set, collection holds that number of messages in memory and invokes `remove` event for the messages trimmed out. (default: 1,000, minimum: 200)                                                                                                                                                                                                      |
-| messageResendPolicy              | String | The policy to resend messages that failed to be sent. 1) `'none'` does not save failed messages into cache and just removes the failed message from view. 2) `'manual'` saves failed messages into cache but doesn't resend them automatically. 3) `'automatic'` saves failed messages and also resend them when sync resumes or the failed messages are fetched from cache. (default: `'automatic'`) |
-| automaticMessageResendRetryCount | Number | Set the retry count of automatic resend. Once the number of failures in resending message reaches to it, the message remains as failed message and not going to get resent again. Only available when `messageResentPolicy` is set to `automatic`. (default: `Infinity`)                                                                                                                              |
-| maxFailedMessageCountPerChannel  | Number | Set the maximum number of failed messages allowed in a channel. If the number of failed messages exceeds the count, the oldest failed message would get trimmed out. (default: `Infinity`)                                                                                                                                                                                                            |
-| failedMessageRetentionDays       | Number | Set the number of days to retain failed messages. Failed messages which pass the retension period since its creation will be removed automatically. (default: `7`)                                                                                                                                                                                                                                    |
+| Option                           | Type   | Description                                                                                                                                                                                                                                                                                                                                                                                      |
+| :------------------------------- | :----- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| messageCollectionCapacity        | Number | Limit the number of messages in a collection. If set, collection holds that number of messages in memory and invokes `remove` event for the messages trimmed out. (default: 1,000, minimum: 200)                                                                                                                                                                                                 |
+| messageResendPolicy              | String | The policy to resend messages that failed to be sent. 1) `'none'` does not save failed messages into cache and just removes the failed message from view. 2) `'manual'` saves failed messages into cache but doesn't resend them automatically. 3) `'automatic'` saves failed messages and also resend them when sync resumes or the failed messages are fetched from cache. (default: `'none'`) |
+| automaticMessageResendRetryCount | Number | Set the retry count of automatic resend. Once the number of failures in resending a message reaches to the count, the message remains as failed message and not going to get resent again like `manual` resend option. Only available when `messageResentPolicy` is set to `automatic`. (default: `Infinity`)                                                                                    |
+| maxFailedMessageCountPerChannel  | Number | Set the maximum number of failed messages allowed in a channel. If the number of failed messages exceeds the count, the oldest failed message would get trimmed out. (default: `Infinity`)                                                                                                                                                                                                       |
+| failedMessageRetentionDays       | Number | Set the number of days to retain failed messages. Failed messages which pass the retention period since its creation will be removed automatically. (default: `7`)                                                                                                                                                                                                                               |
 
 You can initialize SyncManager with options like below:
 
@@ -173,50 +172,36 @@ Regarding on sending a message, `MessageCollection` manages it along with the re
 `MessageCollection` has event subscriber. You can create an instance and implement the event handler and add it to the collection. Event subscriber is named as `CollectionHandler` and event handler receives `action` and `message` when an event has come. The `action` is a keyword to notify what happened to the channel, and the `item` is the target `sb.BaseMessage` instance.
 
 ```js
-const collectionHandler = new SendBirdSyncManager.MessageCollection.CollectionHandler();
-collectionHandler.onPendingMessageEvent = (messages, action) => {
-  // apply each event to view here
-  switch(action) {
-    case SendBirdSyncManager.MessageCollection.Action.INSERT: {
-      break;
-    }
-    case SendBirdSyncManager.MessageCollection.Action.REMOVE: {
-      break;
-    }
-  }
+const messageCollectionHandler = new SendBirdSyncManager.MessageCollection.CollectionHandler();
+messageCollectionHandler.onPendingMessageEvent = (messages, action) => {
+  // Message waiting to be processed...
+  // action - INSERT = Starting to Send a message
+  // action - REMOVE = Something else happened to the message
+  // - Message was sent successfully
+  // - Message was not sent successfully 
+  // - Message was moved to the resend queue
 };
-collectionHandler.onFailedMessageEvent = (messages, action) => {
-  // apply each event to view here
-  switch(action) {
-    case SendBirdSyncManager.MessageCollection.Action.INSERT: {
-      break;
-    }
-    case SendBirdSyncManager.MessageCollection.Action.UPDATE: {
-      break;
-    }
-    case SendBirdSyncManager.MessageCollection.Action.REMOVE: {
-      break;
-    }
-  }
+messageCollectionHandler.onSucceededMessageEvent = (messages, action) => {
+  // Local message collection received a new message.
+  // action - INSERT = One or more Messages were successfully sent.
+  // action - INSERT = One ore more messages arrived or the user called //fetch()
+  // action - UPDATE = One or more messages were updated.
+  // action - REMOVE = One or more messages were deleted.
+  // action - CLEAR = A channel was removed or deleted so the messages were removed. 
 };
-collectionHandler.onSucceededMessageEvent = (messages, action) => {
-  // apply each event to view here
-  switch(action) {
-    case SendBirdSyncManager.MessageCollection.Action.INSERT: {
-      break;
-    }
-    case SendBirdSyncManager.MessageCollection.Action.UPDATE: {
-      break;
-    }
-    case SendBirdSyncManager.MessageCollection.Action.REMOVE: {
-      break;
-    }
-    case SendBirdSyncManager.MessageCollection.Action.CLEAR: {
-      break;
-    }
-  }
+messageCollectionHandler.onNewMessage = (message) => {
+  // A new message arrived
+  //Provides the ability to notify a user of a new message arrived independently of updating the message view.
 };
-collectionHandler.onNewMessage = message => {
+messageCollectionHandler.onFailedMessageEvent = (messages, action) => {
+  // Message couldn't be sent - Will try resending.
+  // Fires when a message first fails. 
+  // Action - Insert - message added to the queue for resending
+  // Action - Insert - user called fetch failed messages.  
+  // Action - Removed - message removed from queue for resending.
+  // Action - Updated - user updated message that was queued for resending.
+};
+messageCollectionHandler.onNewMessage = message => {
   // new message has arrived but it's not continuous with the messages in the collection.
   // for example, suppose that you have messages [ A, B, C, D, E ] in a channel. (A is the oldest one).
   // and the collection has [ A, B, C ] which means the user sees the messages [ A, B, C ] (D, E are not shown yet).
@@ -224,7 +209,7 @@ collectionHandler.onNewMessage = message => {
   // in that scenario, SyncManager invokes onNewMessage for the message F instead of onSucceededMessageEvent
   // so that you'd show the user that new message has arrived rather than attaches the message to the view.
 };
-collection.setCollectionHandler(collectionHandler);
+collection.setCollectionHandler(messageCollectionHandler);
 
 // you can cancel event subscription by calling unsubscribe() like:
 collection.removeCollectionHandler();

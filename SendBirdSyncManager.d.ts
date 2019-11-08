@@ -175,6 +175,9 @@ interface MessageCollectionHandler {
   onNewMessage(message: Message): void;
 
   onMessageEvent(action: MessageEventAction, messages: Array<Message>): void; // DEPRECATED
+
+  onChannelRemoved(channel: GroupChannel): void;
+  onChannelUpdated(channel: GroupChannel): void
 }
 
 // callback
