@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.17(APR 17, 2020)
+
+- Limit the number of resend retry.
+- React Native AsyncStorage bug-fix.
+
 ## v1.1.16(FEB 6, 2020)
 
 - Improved stability.
