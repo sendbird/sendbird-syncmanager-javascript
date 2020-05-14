@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.18(MAY 14, 2020)
+
+- Performance improvement.
+
 ## v1.1.17(APR 17, 2020)
 
 - Limit the number of resend retry.
