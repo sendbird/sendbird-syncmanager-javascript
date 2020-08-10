@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.19(AUG 10, 2020)
+
+- Huge performance improvement in React Native.
+
 ## v1.1.18(MAY 14, 2020)
 
 - Performance improvement.
