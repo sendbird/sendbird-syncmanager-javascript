@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.20(SEP 25, 2020)
+
+- Added `fetchPendingMessages()` in `MessageCollection`.
+- Pending messages resolve later even if the collection is destroyed.
+- Bug-fix: cached unread count not overwritten.
+- Improved stability.
+
 ## v1.1.19(AUG 10, 2020)
 
 - Huge performance improvement in React Native.

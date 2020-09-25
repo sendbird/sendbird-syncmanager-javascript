@@ -128,6 +128,8 @@ interface MessageCollectionInstance {
   fetch(direction: 'prev' | 'next'): Promise<void>; // DEPRECATED
   fetch(direction: 'prev' | 'next', callback: ErrorCallback): void; // DEPRECATED
 
+  fetchPendingMessages(): Promise<void>;
+  fetchPendingMessages(callback: ErrorCallback): void;
   fetchFailedMessages(): Promise<void>;
   fetchFailedMessages(callback: ErrorCallback): void;
   fetchSucceededMessages(): Promise<void>;
@@ -177,7 +179,7 @@ interface MessageCollectionHandler {
   onMessageEvent(action: MessageEventAction, messages: Array<Message>): void; // DEPRECATED
 
   onChannelRemoved(channel: GroupChannel): void;
-  onChannelUpdated(channel: GroupChannel): void
+  onChannelUpdated(channel: GroupChannel): void;
 }
 
 // callback
