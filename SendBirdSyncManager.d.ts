@@ -8,6 +8,7 @@ type Message = UserMessage | FileMessage | AdminMessage;
 
 export { SendBirdSyncManager, ChannelCollection, MessageCollection };
 export as namespace SendBirdSyncManager;
+export = SendBirdSyncManager;
 
 declare const SendBirdSyncManager: SendBirdSyncManagerStatic;
 declare const ChannelCollection: ChannelCollectionStatic;
