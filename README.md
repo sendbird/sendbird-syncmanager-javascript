@@ -61,7 +61,7 @@ Download the sample app to test the core features of SyncManager for Javascript.
 
 - https://github.com/sendbird/SendBird-JavaScript/tree/master/web-basic-sample-syncmanager
 
-> **Note**: The fastest way to test our SyncManager is to build your chat app on top of our sample app. Make sure to change the application ID of the sample app to your own. Go to the [Create a Sendbird application from your dashboard section]() to learn more.
+> **Note**: The fastest way to test our SyncManager is to build your chat app on top of our sample app. Make sure to change the application ID of the sample app to your own. Go to the [Create a Sendbird application from your dashboard section](#step-1-create-a-sendbird-application-from-your-dashboard) to learn more.
 
 ### Step 1: Create a Sendbird application from your dashboard
 
