@@ -4,7 +4,6 @@
 ![Languages](https://img.shields.io/badge/language-JAVASCRIPT-orange.svg)
 [![npm](https://img.shields.io/npm/v/sendbird-syncmanager.svg?style=popout&colorB=red)](https://www.npmjs.com/package/sendbird-syncmanager)
 
-
 ## Table of contents
 
   1. [Introduction](#introduction)
@@ -69,7 +68,7 @@ A Sendbird application comprises everything required in a chat service including
 
 1. Go to the Sendbird Dashboard and enter your email and password, and create a new account. You can also sign up with a Google account.
 2. When prompted by the setup wizard, enter your organization information to manage Sendbird applications.
-3. Lastly, when your dashboard home appears after completing setup, click Create App at the top-right corner.
+3. Lastly, when your dashboard home appears after completing setup, click **Create +** at the top-right corner.
 
 Regardless of the platform, only one Sendbird application can be integrated per app; however, the application supports communication across all Sendbird’s provided platforms without any additional setup. 
 
