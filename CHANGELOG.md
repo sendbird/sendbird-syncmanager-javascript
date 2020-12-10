@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.21(DEC 10, 2020)
+
+- Added `deleteMessageByRequestID()` in `MessageCollection`.
+- Fixed broken interface in `SendBirdSyncManager.d.ts`.
+- Bug-fix in `unreadChannelFilter` operation.
+
 ## v1.1.20(SEP 25, 2020)
 
 - Added `fetchPendingMessages()` in `MessageCollection`.

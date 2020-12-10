@@ -6,8 +6,8 @@ type FileMessage = SendBird.FileMessage;
 type AdminMessage = SendBird.AdminMessage;
 type Message = UserMessage | FileMessage | AdminMessage;
 
-export { SendBirdSyncManager, ChannelCollection, MessageCollection };
-export as namespace SendBirdSyncManager;
+export default SendBirdSyncManager;
+export { ChannelCollection, MessageCollection };
 
 declare const SendBirdSyncManager: SendBirdSyncManagerStatic;
 declare const ChannelCollection: ChannelCollectionStatic;
@@ -48,7 +48,7 @@ interface SyncManagerOptions {
   failedMessageRetentionDays: number;
 }
 interface SyncManagerOptionsStatic {
-  new (): SyncManagerOptions;
+  new(): SyncManagerOptions;
 }
 
 interface SendBirdSyncManagerInstance {
@@ -64,7 +64,7 @@ interface SendBirdSyncManagerInstance {
 
 // ChannelManager
 interface ChannelCollectionStatic {
-  new (query: SendBird.GroupChannelListQuery): ChannelCollectionInstance;
+  new(query: SendBird.GroupChannelListQuery): ChannelCollectionInstance;
   Action: ChannelEventAction;
   CollectionHandler: ChannelCollectionHandlerStatic;
 }
@@ -86,7 +86,7 @@ declare enum ChannelEventAction {
   CLEAR = 'clear'
 }
 interface ChannelCollectionHandlerStatic {
-  new (): ChannelCollectionHandler;
+  new(): ChannelCollectionHandler;
 }
 interface ChannelCollectionHandler {
   onChannelEvent(action: ChannelEventAction, channels: Array<GroupChannel>): void;
@@ -100,7 +100,7 @@ interface MessageFilter {
   includeMetaArray: boolean;
 }
 interface MessageCollectionStatic {
-  new (channel: GroupChannel, filter?: MessageFilter, viewpointTimestamp?: number): MessageCollectionInstance;
+  new(channel: GroupChannel, filter?: MessageFilter, viewpointTimestamp?: number): MessageCollectionInstance;
   Action: MessageEventAction;
   FailedMessageEventActionReason: FailedMessageEventActionReason;
   CollectionHandler: MessageCollectionHandlerStatic;
@@ -144,6 +144,7 @@ interface MessageCollectionInstance {
   appendMessage(message: Message): void;
   updateMessage(message: Message): void;
   deleteMessage(message: Message): void;
+  deleteMessageByRequestID(requestId: string): void;
 
   setCollectionHandler(handler: MessageCollectionHandler): void;
   removeCollectionHandler(): void;
@@ -164,7 +165,7 @@ declare enum FailedMessageEventActionReason {
   REMOVE_UNKNOWN = 'remove_unknown'
 }
 interface MessageCollectionHandlerStatic {
-  new (): MessageCollectionHandler;
+  new(): MessageCollectionHandler;
 }
 interface MessageCollectionHandler {
   onPendingMessageEvent(messages: Array<Message>, action: MessageEventAction): void;
