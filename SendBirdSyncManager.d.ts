@@ -41,6 +41,10 @@ declare enum MessageResendPolicy {
   AUTOMATIC = 'automatic'
 }
 interface SyncManagerOptions {
+  messageStoreCapacity: number;
+  messageStoreEjectionPriotizedLimit: number;
+  messageStoreEjectionSize: number;
+
   messageCollectionCapacity: number;
   messageResendPolicy: MessageResendPolicy;
   automaticMessageResendRetryCount: number;

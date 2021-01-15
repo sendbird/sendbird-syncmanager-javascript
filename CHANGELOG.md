@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.22(JAN 15, 2021)
+
+- Added `messageStoreCapacity`, `messageStoreEjectionPriotizedLimit`, `messageStoreEjectionSize` in `SendBirdSyncManager.Options`.
+  - If the number of all the messages exceeds `messageStoreCapacity`,
+    - It checks if a certain channel has more than `messageStoreEjectionPriotizedLimit` messages.
+      - If yes, it ejects `messageStoreEjectionSize` oldest messages from that channel.
+      - If no, it ejects `messageStoreEjectionSize` oldest messages regardless of channel.
+    - Once the messages are ejected, active collections work as an API-only mode (no sync).
+- Improved stability.
+
 ## v1.1.21(DEC 10, 2020)
 
 - Added `deleteMessageByRequestID()` in `MessageCollection`.
