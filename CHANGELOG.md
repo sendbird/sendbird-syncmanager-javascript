@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.23(FEB 9, 2021)
+
+- New messages to be queued if the background sync does not reach the latest messages.
+- Bug-fix in `handleSendMessageResponse()` not to give the succeeded message.
+- Bug-fix in background sync operation crash due to the absence of lock.
+- Improved stability.
+
 ## v1.1.22(JAN 15, 2021)
 
 - Added `messageStoreCapacity`, `messageStoreEjectionPriotizedLimit`, `messageStoreEjectionSize` in `SendBirdSyncManager.Options`.
