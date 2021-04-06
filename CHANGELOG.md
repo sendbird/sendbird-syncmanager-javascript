@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.24(APR 6, 2021)
+
+- Bug-fix in deleted message not having `channelUrl`.
+
 ## v1.1.23(FEB 9, 2021)
 
 - New messages to be queued if the background sync does not reach the latest messages.
