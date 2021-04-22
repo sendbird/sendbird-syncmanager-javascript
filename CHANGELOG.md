@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.25(APR 22, 2021)
+
+- Bug-fix in `unreadChannelFilter`.
+
 ## v1.1.24(APR 6, 2021)
 
 - Bug-fix in deleted message not having `channelUrl`.
