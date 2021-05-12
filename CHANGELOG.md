@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.26(MAY 12, 2021)
+
+- Improved stability in React Native.
+
 ## v1.1.25(APR 22, 2021)
 
 - Bug-fix in `unreadChannelFilter`.
