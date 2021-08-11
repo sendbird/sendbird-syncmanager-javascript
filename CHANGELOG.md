@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.27(AUG 11, 2021)
+
+- Improved stability in `AsyncDB` in React Native.
+
 ## v1.1.26(MAY 12, 2021)
 
 - Improved stability in React Native.
