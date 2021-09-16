@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.29(SEP 16, 2021)
+
+- Bug-fix read-only property error in `AsyncDB`.
+
 ## v1.1.28(SEP 7, 2021)
 
 - Improved stability.
