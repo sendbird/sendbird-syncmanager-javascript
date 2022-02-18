@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.30(FEB 18, 2022)
+- Migrated deprecated API.
+
 ## v1.1.29(SEP 16, 2021)
 
 - Bug-fix read-only property error in `AsyncDB`.
