@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sendbird-syncmanager-javascript
+  description: Sendbird SyncManager for JavaScript is an add-on for reliable chat data caching with Chat SDK features
+  annotations:
+    github.com/project-slug: sendbird/sendbird-syncmanager-javascript
+spec:
+  type: library
+  lifecycle: production
+  owner: dep-client-platform
+  system: sendbird-chat
